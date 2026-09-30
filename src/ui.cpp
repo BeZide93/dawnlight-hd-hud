@@ -210,10 +210,7 @@ ModResult build_hud_tab(
     if (add_select(ctx, left, "Shoulder & D-Pad Behavior",
             controller_compatibility_config_var(), kControllerCompatibility,
             std::size(kControllerCompatibility),
-            "Controls Midna, shoulder/trigger handling, and related D-Pad shortcuts.<br/><br/>"
-            "Follow Dusklight Bindings respects the configured Midna assignment and adjusts "
-            "D-Pad shortcuts around it. TPHD Fixed Bindings puts Midna on L and uses TPHD "
-            "shoulder/trigger and D-Pad behavior.<br/><br/>"
+            "Follow uses your Midna binding. Fixed puts Midna on L.<br/>"
             "Face-button bindings are always configured in Dusklight.")
         != MOD_OK)
     {
@@ -259,18 +256,9 @@ ModResult build_hud_tab(
         return MOD_ERROR;
     if (add_toggle(ctx, left, "D-Pad Shortcuts",
         feature_config_var(Feature::DpadShortcuts),
-        "Adds TPHD map, minimap, and Items/Collection shortcuts and their HUD labels. "
-        "Turn off to let Dusklight or another mod handle the D-Pad. The Items / Collection "
-        "Buttons setting then has no effect. Restart Dusklight to apply.") != MOD_OK) return MOD_ERROR;
-    if (add_toggle(ctx, left, "Map / Minimap on D-Pad Left", map_left_config_var(),
-            "Allow this mod to use Left for map controls. Off leaves Left available to other mods.") != MOD_OK ||
-        add_toggle(ctx, left, "Map / Minimap on D-Pad Right", map_right_config_var(),
-            "Allow this mod to use Right for map controls. Off leaves Right available to other mods.") != MOD_OK)
-        return MOD_ERROR;
-    return add_toggle(ctx, left, "Combine Map / Minimap on Up", combined_map_config_var(),
-        "Up shows the minimap, then opens the full map. Up closes the full map and hides the minimap. "
-        "This releases Left and Right from map controls. Call Midna on Up takes priority; assign Midna elsewhere. "
-        "These settings apply while D-Pad Shortcuts is on.");
+        "Enable TPHD map and menu shortcuts. Off uses native D-Pad controls. Restart to apply.") != MOD_OK) return MOD_ERROR;
+    return add_toggle(ctx, left, "Map / Minimap on Up", combined_map_config_var(),
+        "Up cycles minimap, full map, then hidden. Leaves Left/Right free. Midna takes priority.");
 }
 
 HudSizeSetting size_setting(void* data) {

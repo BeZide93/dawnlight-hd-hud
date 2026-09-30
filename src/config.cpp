@@ -24,8 +24,6 @@ ConfigVarHandle s_textFont = 0;
 ConfigVarHandle s_itemsScreen = 0;
 ConfigVarHandle s_swapMenuButtons = 0;
 ConfigVarHandle s_checkForUpdates = 0;
-ConfigVarHandle s_mapLeft = 0;
-ConfigVarHandle s_mapRight = 0;
 ConfigVarHandle s_combinedMap = 0;
 std::array<ConfigVarHandle, 3> s_featureHandles{};
 std::array<bool, 3> s_activeFeatures{true, true, true};
@@ -132,9 +130,7 @@ ModResult register_config(ModError* error) {
         register_int("items-screen", 0, s_itemsScreen) != MOD_OK ||
         register_menu_swap() != MOD_OK ||
         register_bool("check-for-updates", true, s_checkForUpdates) != MOD_OK ||
-        register_bool("map-dpad-left", true, s_mapLeft) != MOD_OK ||
-        register_bool("map-dpad-right", true, s_mapRight) != MOD_OK ||
-        register_bool("combined-map-control", false, s_combinedMap) != MOD_OK)
+        register_bool("combined-map-control", true, s_combinedMap) != MOD_OK)
     {
         return mods::set_error(
             error, MOD_ERROR, "failed to register Twilight HD settings");
@@ -271,12 +267,8 @@ bool get_bool(ConfigVarHandle handle, bool fallback) {
 }
 }
 bool check_for_updates_enabled() { return get_bool(s_checkForUpdates, true); }
-bool map_left_enabled() { return get_bool(s_mapLeft, true); }
-bool map_right_enabled() { return get_bool(s_mapRight, true); }
-bool combined_map_control() { return get_bool(s_combinedMap, false); }
+bool combined_map_control() { return get_bool(s_combinedMap, true); }
 ConfigVarHandle check_for_updates_config_var() { return s_checkForUpdates; }
-ConfigVarHandle map_left_config_var() { return s_mapLeft; }
-ConfigVarHandle map_right_config_var() { return s_mapRight; }
 ConfigVarHandle combined_map_config_var() { return s_combinedMap; }
 
 }  // namespace twilight_hd_hud

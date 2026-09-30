@@ -216,13 +216,12 @@ Twilight Princess, its characters, and its original assets are properties of Nin
 
 ## Map controls
 
-With D-Pad Shortcuts enabled, **Map / Minimap on D-Pad Left** and **Map / Minimap
-on D-Pad Right** independently release those directions from this mod's map
-handling. **Combine Map / Minimap on Up** releases both side directions: Up
-shows the minimap, opens the full map, then closes it and hides the minimap.
-Closing with B preserves the previous minimap preference. A dedicated Midna
-assignment takes priority; move Midna off Up to use the combined control.
-Other configured Midna and Collection actions still retain their own directions.
+With D-Pad Shortcuts enabled, **Map / Minimap on Up** uses Up to show the
+minimap, open the full map, then close it and hide the minimap. Left and Right
+are free from this mod's map controls. Closing with B preserves the previous
+minimap preference. Turn this option off for the original separate map/minimap
+layout. A dedicated Midna assignment takes priority; move Midna off Up to use
+this control. Other configured Midna and Collection actions retain their directions.
 With D-Pad Shortcuts disabled, native map close/hide behavior controls visibility.
 
 The **Text Font** setting also includes **Alegreya Sans Medium**. Restart Dusklight

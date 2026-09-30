@@ -7,7 +7,7 @@
 - Verify release package size and SHA-256 before replacement.
 - Resolve R-slot item presentation directly in the native NPC event instead of substituting an X-slot read.
 - Restore native minimap close/hide behavior when D-Pad shortcuts are disabled.
-- Add independent Left/Right map controls and a combined Up map/minimap cycle.
+- Add one Up map/minimap cycle setting, with shorter help text and no redundant Left/Right toggles.
 - Add Alegreya Sans Medium to the font selection.
 
 ## v2.4.4 - 2026-09-24

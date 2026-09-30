@@ -820,7 +820,6 @@ DpadMapMasks active_map_masks() {
     return dpad_map_masks(fixed ? PAD_BUTTON_UP : game_button_for_dpad_direction(layout.map),
         fixed ? PAD_BUTTON_LEFT | PAD_BUTTON_RIGHT : game_button_for_dpad_direction(layout.minimap),
         !fixed && layout.combinedMapAndMinimap, combined_map_control(),
-        map_left_enabled(), map_right_enabled(),
         fixed ? 0u : game_button_for_dpad_direction(layout.midna),
         PAD_BUTTON_UP, PAD_BUTTON_LEFT, PAD_BUTTON_RIGHT);
 }

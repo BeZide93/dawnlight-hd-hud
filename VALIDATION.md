@@ -25,7 +25,7 @@ Before publishing or closing the corresponding issues, verify in Dusklight:
    different item. Repeat from X and Y, and test another trade-item NPC.
 2. Turn D-Pad Shortcuts off, restart, and close dungeon/overworld maps using Left.
    Confirm native minimap hide behavior and warp preference handling.
-3. Enable shortcuts and test Left/Right independently, combined Up cycling,
+3. Enable shortcuts and test combined Up cycling and the separate layout,
    Midna on each direction, touch controls, and a second mod using released keys.
 4. Inspect Alegreya dialogue with accents and long lines in supported languages.
 5. Recheck Save, Collection, and prompts in GameCube/Wii U/Dusklight scaling modes.

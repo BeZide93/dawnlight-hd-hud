@@ -80,12 +80,8 @@ TextFont text_font();
 bool item_bank_enabled();
 bool swap_menu_buttons();
 bool check_for_updates_enabled();
-bool map_left_enabled();
-bool map_right_enabled();
 bool combined_map_control();
 ConfigVarHandle check_for_updates_config_var();
-ConfigVarHandle map_left_config_var();
-ConfigVarHandle map_right_config_var();
 ConfigVarHandle combined_map_config_var();
 
 ConfigVarHandle button_layout_config_var();
