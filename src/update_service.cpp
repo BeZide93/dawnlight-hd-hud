@@ -70,7 +70,7 @@ std::filesystem::path update_target() {
     std::filesystem::path candidate;
     std::size_t count = 0;
     std::error_code ec;
-    const char* knownNames[] = {"Twilight-HD-HUD.dusk", "Twilight-HD-HUD-Desktop-Android.dusk",
+    const char* knownNames[] = {"org.twilight.hd_hud.dusk", "Twilight-HD-HUD.dusk", "Twilight-HD-HUD-Desktop-Android.dusk",
         "twilight_hd_hud.dusk", "Twilight-HD-HUD-iOS-tvOS.dusk", "Twilight-HD-HUD-tvOS.dusk"};
     for (const auto* name : knownNames) {
         const auto path = mods / name;

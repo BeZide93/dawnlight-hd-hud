@@ -89,6 +89,14 @@ int main() {
         assert(installAction==nullptr && downloadPath.empty());
         assert(read(package)=="existing package");
     }
+    if (kCanSelfInstall) {
+        const auto managerName = temp/"mods/org.twilight.hd_hud.dusk";
+        fs::rename(package, managerName);
+        assert(update_target() == managerName); // Online-mod installation filename.
+        write(package, "duplicate");
+        assert(update_target().empty());
+        fs::remove(package);
+    }
     shutdown_update_service();
     svc_http=nullptr;
     request_update_check(nullptr,reinterpret_cast<void*>(1)); update_update_service();
