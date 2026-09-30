@@ -16,7 +16,7 @@ release; see [COMPATIBILITY.md](COMPATIBILITY.md) for the maintenance checklist.
 - Independent D-Pad and minimap behavior
 - Human and wolf action artwork
 - ABXY, BAYX, BAYX Flipped, PlayStation-symbol, and blank button-label options
-- Four text fonts: Original, Zen Kaku Gothic New, M PLUS 2, and Dusklight's Fira Sans family.
+- Five text fonts: Original, Zen Kaku Gothic New, M PLUS 2, Fira Sans, and Alegreya Sans Medium.
 - Editable HUD sizes from 50% to 125% in 1% steps, with reset-to-100% buttons.
   Overall HUD Size overrides visual HUD groups when it is not 100%, without
   changing text. Action Text and Dialogue Text remain independent. At 100%,
@@ -107,7 +107,7 @@ No controller profile is rewritten.
 
 Twilight HD includes native executable code. On standard iOS and tvOS devices,
 it must be bundled and signed with Dusklight. Use `Twilight-HD-HUD.dusk` for iPhone/iPad or `Twilight-HD-HUD-tvOS.dusk` for Apple TV. The files
-in [Releases](../../releases/latest) is for that packaging workflow; copying an
+in [Releases](../../releases/latest) are for that packaging workflow; copying an
 unsigned package into the writable `mods` folder is not sufficient.
 
 Install a signed Dusklight app build containing the desired Twilight HD version,
@@ -122,16 +122,13 @@ packages require manual installation. Offline checks leave the mod usable.
 
 iOS and tvOS support **update notices only**. They never download or replace the
 native mod themselves; install a newly bundled and signed Dusklight app instead.
-Twilight HD no longer performs its own GitHub checks or displays separate update controls.
-On iOS and tvOS, native-code updates still require an updated signed Dusklight app
-containing the newer mod; the catalog cannot install native code on those platforms.
 
 The package does not contain game files. A compatible, legally obtained disc image is required by Dusklight.
 
 ## Fonts and HUD size
 
 Open **Twilight HD Settings** to choose a text font. **Original** keeps the
-game's font; the other three options use open-source fonts. Fully quit and
+game's font; the other four options use open-source fonts. Fully quit and
 restart Dusklight after changing fonts. Western-language message text is
 supported; decorative fonts and unsupported characters keep their original
 artwork. Text spacing and line wrapping are unchanged.
@@ -142,15 +139,14 @@ rupees, and minimap separately. Any other overall value overrides those visual
 controls without multiplying their saved percentages. D-Pad and controller
 diamond sizing changes icons, not their labels; Action Text and Dialogue Text
 remain independent of Overall. Each control has a reset-to-100% button. Use
-Dusklight's **Minimal HUD** setting to hide the HUD.
+**Settings → Gameplay → Minimal HUD** in Dusklight to hide the HUD.
 
 ## Controller layouts
 
 **Steam Deck** uses BAYX Flipped face prompts with L1/R1 and L2/R2.
 Its BOTW variant uses the BAYX Flipped (BOTW Style) positions.
 **PlayStation** layouts support DualSense and other PlayStation controllers.
-PlayStation BOTW Style
-places Action on Cross/South, Attack on Square/West, and items on Triangle/North
+PlayStation BOTW Style places Action on Cross/South, Attack on Square/West, and items on Triangle/North
 and Circle/East. Flipped BOTW exchanges the two item positions.
 These choices change prompts only; configure matching bindings in Dusklight.
 
@@ -168,7 +164,7 @@ put Attack on East and Action on South. Custom bindings remain unchanged.
 - L: Midna in TPHD Fixed Bindings
 - D-Pad Down: Collection/Save (Items with the menu swap off)
 - Start / +: Items (Collection/Save with the menu swap off)
-- D-Pad Left/Right: minimap toggle
+- D-Pad Up: minimap/map/hidden cycle when Map / Minimap on Up is enabled
 - ZL: enemy lock-on/defend and paused item combinations
 - ZR: Gale Boomerang multi-target lock
 - A: context action
@@ -184,8 +180,8 @@ The project builds against the Dusklight mod SDK. Supported build targets are:
 
 | Download | Native targets |
 | --- | --- |
-| Desktop and Android | Windows x64, Linux x64 / Steam Deck, macOS Apple Silicon, Android ARM64 |
-| iOS and tvOS | iPhone and iPad ARM64, Apple TV ARM64 |
+| Universal | Windows x64/ARM64, Linux x64/ARM64, macOS Intel/Apple Silicon, Android ARM64, iOS ARM64 |
+| tvOS | Apple TV ARM64 |
 
 ### Host-platform build
 

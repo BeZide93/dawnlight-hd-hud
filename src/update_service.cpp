@@ -138,9 +138,7 @@ bool replace_download(const std::filesystem::path& downloaded) {
     ec.clear();
     fs::rename(temporary, target, ec);
     if (!ec) {
-        // The backup is needed only while replacement is in progress. Once
-        // the new package occupies the original path, do not leave an
-        // unexplained file in the user's mods directory.
+        // Remove the temporary backup after a successful replacement.
         fs::remove(backup, ec);
         return true;
     }

@@ -4381,7 +4381,7 @@ void apply_wii_u_r_button_art(dMeter2Draw_c* meter) {
     // The Wii U badge includes its own R glyph.  The stock Z prompt is split
     // into a glyph, glow, and action-text pane; its animation can re-show the
     // panes after hide(), so also force their local alpha to zero.  This does
-    // not touch zbtn (our R badge), item_r_n, or the assigned item/count.
+    // not touch zbtn (the R badge), item_r_n, or the assigned item/count.
     constexpr u64 legacyZPanes[] = {
         MULTI_CHAR('z_btn_t'),
         MULTI_CHAR('z_btnl'),
@@ -8862,7 +8862,7 @@ void after_select_cursor_update(ModContext*, void* args, void*, void*) {
 }
 
 HookAction before_fmap_move(ModContext*, void*, void*, void*) {
-    // L/LB/L1 is the physical shoulder, not GameCube L (our ZL trigger).
+    // L/LB/L1 is the physical shoulder, not GameCube L (the ZL trigger).
     // Replace native Z only within map input processing, then restore it.
     interface_of_controller_pad& pad = mDoCPd_c::getCpadInfo(PAD_1);
     s_mapPortalHeldOriginal = pad.mButtonFlags;
@@ -10826,9 +10826,7 @@ HookAction before_talk_item_check(ModContext*, void* args, void* retval, void*) 
         order->mpRequestActor != s_thirdSlotTalk.player ||
         order->mpTargetActor != s_thirdSlotTalk.target) return HOOK_CONTINUE;
 
-    // Preserve native event validation and NPC dispatch, but supply the
-    // captured R item directly. Nested getSelectItem hooks are not reliable
-    // when the host compiler inlines the selected-item read.
+    // Use the captured R item while preserving native NPC event checks.
     const u8 item = s_thirdSlotTalk.item;
     s_thirdSlotTalk = {};
     events->mTalkXyType = 1;

@@ -1,17 +1,12 @@
 # Changelog
 
-## v2.5.0 - Unreleased
+## v2.5.0 - 2026-09-30
 
-- Move concise HUD sizing instructions to the right panel, including keyboard/controller help.
-- Add Steam Deck layouts with numbered shoulders and PlayStation BOTW/Flipped BOTW prompts (including DualSense).
-
-- Restore independent GitHub update checks and confirmed installation on desktop and Android.
-- Keep iOS and tvOS updates notice-only; native updates require a bundled and signed app.
-- Verify release package size and SHA-256 before replacement.
-- Resolve R-slot item presentation directly in the native NPC event instead of substituting an X-slot read.
-- Restore native minimap close/hide behavior when D-Pad shortcuts are disabled.
-- Add one Up map/minimap cycle setting, with shorter help text and no redundant Left/Right toggles.
-- Add Alegreya Sans Medium to the font selection.
+- Added Alegreya Sans Medium as a font option.
+- Added Steam Deck layouts with L1/R1 and L2/R2 prompts, plus PlayStation BOTW and Flipped BOTW layouts for DualSense and other PlayStation controllers.
+- Added “Map / Minimap on Up” option that restores native minimap behavior when D-Pad Shortcuts are disabled.
+- Improved presenting quest items from the third item slot (R).
+- Restored mod built-in update check.
 
 ## v2.4.4 - 2026-09-24
 
