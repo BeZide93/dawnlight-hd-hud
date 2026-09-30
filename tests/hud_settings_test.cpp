@@ -85,11 +85,11 @@ static ModResult window(ModContext*, const UiWindowDesc* desc, UiWindowHandle* h
     assert(std::string(controls[0].options[5]) == "BAYX Flipped (BOTW Style)");
     assert(std::string(controls[0].options[6]) == "Universal");
     assert(std::string(controls[0].options[7]) == "Universal (BOTW Style)");
-    assert(std::string(controls[0].options[8]) == "DualSense / PlayStation");
-    assert(std::string(controls[0].options[9]) == "DualSense / PlayStation (Cross Action)");
-    assert(std::string(controls[0].options[10]) == "DualSense / PlayStation (Flipped)");
-    assert(std::string(controls[0].options[11]) == "DualSense (BOTW Style)");
-    assert(std::string(controls[0].options[12]) == "DualSense Flipped (BOTW Style)");
+    assert(std::string(controls[0].options[8]) == "PlayStation");
+    assert(std::string(controls[0].options[9]) == "PlayStation (Cross Action)");
+    assert(std::string(controls[0].options[10]) == "PlayStation (Flipped)");
+    assert(std::string(controls[0].options[11]) == "PlayStation (BOTW Style)");
+    assert(std::string(controls[0].options[12]) == "PlayStation Flipped (BOTW Style)");
     assert(std::string(controls[0].options[13]) == "Steam Deck");
     assert(std::string(controls[0].options[14]) == "Steam Deck (BOTW Style)");
     assert(std::string(controls[0].help_rml).find("L1/R1 and L2/R2") != std::string::npos);

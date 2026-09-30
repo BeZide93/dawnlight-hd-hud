@@ -3,7 +3,7 @@
 ## v2.5.0 - Unreleased
 
 - Move concise HUD sizing instructions to the right panel, including keyboard/controller help.
-- Add Steam Deck layouts with numbered shoulders and DualSense BOTW/Flipped BOTW prompts.
+- Add Steam Deck layouts with numbered shoulders and PlayStation BOTW/Flipped BOTW prompts (including DualSense).
 
 - Restore independent GitHub update checks and confirmed installation on desktop and Android.
 - Keep iOS and tvOS updates notice-only; native updates require a bundled and signed app.
