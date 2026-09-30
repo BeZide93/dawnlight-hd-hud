@@ -286,8 +286,8 @@ void reset_size(ModContext*, void* data) { set_hud_size_percent(size_setting(dat
 
 constexpr const char* kSizingGuide =
     "• Enter 50–125% or use Left/Right. Changes apply live.<br/>"
-    "• Set Overall to 100% to edit individual icons. Text sizes stay independent.<br/><br/>"
-    "Hide the HUD with Dusklight's Minimal HUD setting.";
+    "• Set Overall to 100% to edit individual icons. Text sizes stay independent.<br/>"
+    "To hide the HUD, enable Minimal HUD in Dusklight's Gameplay settings.";
 
 ModResult build_hud_sizing_tab(
     ModContext* ctx, UiWindowHandle, UiElementHandle left, UiElementHandle right, void*, ModError*) {
