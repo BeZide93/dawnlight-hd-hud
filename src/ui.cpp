@@ -1,5 +1,6 @@
 #include "config.hpp"
 #include "service_imports.hpp"
+#include "update_service.hpp"
 
 #include "mods/service.hpp"
 #include "mods/svc/host.h"
@@ -223,6 +224,7 @@ ModResult build_hud_tab(
         "Zen Kaku Gothic New",
         "M PLUS 2",
         "Dusklight - Fira Sans",
+        "Alegreya Sans Medium",
     };
     if (add_select(ctx, left, "Text Font (restart required)", text_font_config_var(),
             kTextFonts, std::size(kTextFonts),
@@ -255,11 +257,20 @@ ModResult build_hud_tab(
             "Styles and rearranges the main Collection screen. Turn off to leave its layout "
             "and navigation unchanged. Journals remain enabled. Restart Dusklight to apply.") != MOD_OK)
         return MOD_ERROR;
-    return add_toggle(ctx, left, "D-Pad Shortcuts",
+    if (add_toggle(ctx, left, "D-Pad Shortcuts",
         feature_config_var(Feature::DpadShortcuts),
         "Adds TPHD map, minimap, and Items/Collection shortcuts and their HUD labels. "
         "Turn off to let Dusklight or another mod handle the D-Pad. The Items / Collection "
-        "Buttons setting then has no effect. Restart Dusklight to apply.");
+        "Buttons setting then has no effect. Restart Dusklight to apply.") != MOD_OK) return MOD_ERROR;
+    if (add_toggle(ctx, left, "Map / Minimap on D-Pad Left", map_left_config_var(),
+            "Allow this mod to use Left for map controls. Off leaves Left available to other mods.") != MOD_OK ||
+        add_toggle(ctx, left, "Map / Minimap on D-Pad Right", map_right_config_var(),
+            "Allow this mod to use Right for map controls. Off leaves Right available to other mods.") != MOD_OK)
+        return MOD_ERROR;
+    return add_toggle(ctx, left, "Combine Map / Minimap on Up", combined_map_config_var(),
+        "Up shows the minimap, then opens the full map. Up closes the full map and hides the minimap. "
+        "This releases Left and Right from map controls. Call Midna on Up takes priority; assign Midna elsewhere. "
+        "These settings apply while D-Pad Shortcuts is on.");
 }
 
 HudSizeSetting size_setting(void* data) {
@@ -376,7 +387,16 @@ ModResult build_mod_panel(ModContext* ctx, UiElementHandle panel, void*, ModErro
     if (add_button(ctx, panel, "Open Twilight HD Settings", open_settings) != MOD_OK) {
         return MOD_ERROR;
     }
-    return MOD_OK;
+    if (add_toggle(ctx, panel, "Auto Update Checks", check_for_updates_config_var(),
+            "Check GitHub releases when the mod starts. Installation requires confirmation.") != MOD_OK)
+        return MOD_ERROR;
+    UiControlDesc update = UI_CONTROL_DESC_INIT;
+    update.kind = UI_CONTROL_BUTTON;
+    update.label = "Check Now";
+    update.on_pressed = request_update_check;
+    update.user_data = reinterpret_cast<void*>(1);
+    update.is_disabled = update_service_busy;
+    return svc_ui->pane_add_control(ctx, panel, &update, nullptr);
 }
 
 }  // namespace

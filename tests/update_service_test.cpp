@@ -1,0 +1,97 @@
+#include "../src/update_service.cpp"
+#include <cassert>
+#include <chrono>
+#include <sstream>
+
+ModContext* mod_ctx = nullptr;
+const ConfigService* svc_config = nullptr;
+const HostService* svc_host = nullptr;
+const HttpService* svc_http = nullptr;
+const UiService* svc_ui = nullptr;
+
+namespace twilight_hd_hud {
+bool check_for_updates_enabled() { return true; }
+ConfigVarHandle check_for_updates_config_var() { return 1; }
+}
+using namespace twilight_hd_hud;
+namespace fs = std::filesystem;
+static HttpCompleteFn completion = nullptr;
+static std::string requestedUrl, downloadPath, dataPath, dialogTitle;
+static UiDialogActionFn installAction = nullptr, dismissAction = nullptr;
+static HttpRequestHandle nextHandle = 1;
+static ModResult request(ModContext*, const HttpRequestDesc* desc, HttpCompleteFn fn, void*, HttpRequestHandle* handle) {
+    completion = fn; requestedUrl = desc->url;
+    downloadPath = desc->download_path ? desc->download_path : "";
+    *handle = nextHandle++; return MOD_OK;
+}
+static ModResult cancel(ModContext*, HttpRequestHandle) { return MOD_OK; }
+static ModResult data_dir(ModContext*, const char** path) { *path=dataPath.c_str(); return MOD_OK; }
+static const char* version(ModContext*) { return "2.4.4"; }
+static ModResult subscribe(ModContext*, ConfigVarHandle, ConfigChangedFn, void*, uint64_t*) { return MOD_OK; }
+static ModResult dialog(ModContext*, const UiDialogDesc* desc, UiDialogHandle*) {
+    dialogTitle=desc->title; dismissAction=desc->on_dismiss;
+    installAction=desc->action_count==2 ? desc->actions[0].on_pressed : nullptr;
+    return MOD_OK;
+}
+static void complete_check(const std::string& json) {
+    HttpResult response{}; response.error=HTTP_ERROR_NONE; response.status_code=200;
+    response.body=json.data(); response.body_size=json.size();
+    completion(nullptr, 1, &response, nullptr); update_update_service();
+}
+static void write(const fs::path& path, const std::string& bytes) {
+    std::ofstream file(path,std::ios::binary); file.write(bytes.data(),bytes.size()); assert(file.good());
+}
+static std::string read(const fs::path& path) {
+    std::ifstream file(path,std::ios::binary); return {std::istreambuf_iterator<char>(file),{}};
+}
+int main() {
+    const fs::path temp=fs::temp_directory_path()/std::string("hud-update-test-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+    dataPath=(temp/"mod_data/org.twilight.hd_hud").string(); fs::create_directories(dataPath); fs::create_directories(temp/"mods");
+    ConfigService config{}; config.subscribe=subscribe; svc_config=&config;
+    HostService host{}; host.mod_version=version; host.data_dir=data_dir; svc_host=&host;
+    HttpService http{}; http.request=request; http.cancel=cancel; svc_http=&http;
+    UiService ui{}; ui.dialog_push=dialog; svc_ui=&ui;
+    const auto package=temp/"mods"/kReleaseAsset;
+    write(package,"existing package");
+    std::string payload="PK\3\4"+std::string(2044,'x');
+    std::istringstream stream(payload); const auto digest=update_policy::sha256(stream);
+    const std::string json=std::string("{\"tag_name\":\"v2.5.0\",\"assets\":[{\"name\":\"")+kReleaseAsset+
+        "\",\"size\":2048,\"digest\":\"sha256:"+digest+"\",\"browser_download_url\":\"https://github.com/OTPR26/twilight-hd-hud/releases/download/v2.5.0/"+kReleaseAsset+"\"}]}";
+    initialize_update_service();
+    assert(requestedUrl.find("api.github.com/repos/OTPR26/twilight-hd-hud/")!=std::string::npos);
+    complete_check(json);
+    if (kCanSelfInstall) {
+        assert(installAction && update_service_busy(nullptr,nullptr));
+        request_update_check(nullptr,reinterpret_cast<void*>(1)); // Cannot replace a pending offer.
+        assert(s_state.load()==State::AwaitingChoice);
+        dismissAction(nullptr,0,nullptr); assert(!update_service_busy(nullptr,nullptr));
+        request_update_check(nullptr,reinterpret_cast<void*>(1)); complete_check(json);
+        installAction(nullptr,0,nullptr); assert(!downloadPath.empty());
+        write(downloadPath,payload.substr(0,2047)+"y");
+        HttpResult downloaded{}; downloaded.error=HTTP_ERROR_NONE; downloaded.status_code=200;
+        downloaded.download_path=downloadPath.c_str();
+        completion(nullptr,2,&downloaded,nullptr); update_update_service();
+        assert(dialogTitle=="Update Failed" && read(package)=="existing package");
+        assert(!fs::exists(downloadPath));
+        // Ambiguous existing packages cannot create or replace a duplicate.
+        write(temp/"mods/twilight_hd_hud.dusk","second copy");
+        request_update_check(nullptr,reinterpret_cast<void*>(1)); complete_check(json);
+        installAction(nullptr,0,nullptr); write(downloadPath,payload);
+        completion(nullptr,3,&downloaded,nullptr); update_update_service();
+        assert(dialogTitle=="Update Failed" && read(package)=="existing package");
+        fs::remove(temp/"mods/twilight_hd_hud.dusk");
+        request_update_check(nullptr,reinterpret_cast<void*>(1)); complete_check(json);
+        installAction(nullptr,0,nullptr); write(downloadPath,payload);
+        completion(nullptr,4,&downloaded,nullptr); update_update_service();
+        assert(dialogTitle=="Update Complete" && read(package)==payload);
+        assert(!fs::exists(package.string()+".previous") && !fs::exists(package.string()+".download"));
+    } else {
+        assert(installAction==nullptr && downloadPath.empty());
+        assert(read(package)=="existing package");
+    }
+    shutdown_update_service();
+    svc_http=nullptr;
+    request_update_check(nullptr,reinterpret_cast<void*>(1)); update_update_service();
+    assert(dialogTitle=="Update Check Failed");
+    fs::remove_all(temp);
+}

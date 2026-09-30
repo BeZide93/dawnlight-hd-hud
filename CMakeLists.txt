@@ -32,6 +32,7 @@ add_mod(twilight_hd_hud
         src/item_slot_hooks.cpp
         src/mod.cpp
         src/ui.cpp
+        src/update_service.cpp
     MOD_JSON mod.json
     RES_DIR res
     OVERLAY_DIR overlay
@@ -52,7 +53,7 @@ if (TWILIGHT_HUD_BUILD_TESTS)
         touch_input_state map_touch_portals file_select_layout ui_refinements collection_layout
         item_bank_layout wallet_description dungeon_map_layout
         action_prompt_layout dialogue_text_layout overworld_map_layout
-        localized_labels
+        localized_labels dpad_map_policy update_policy update_service
     )
         add_executable(${test_name}_test tests/${test_name}_test.cpp)
         target_compile_features(${test_name}_test PRIVATE cxx_std_20)
@@ -65,11 +66,21 @@ if (TWILIGHT_HUD_BUILD_TESTS)
         endif ()
         if (test_name STREQUAL "font_atlas")
             add_test(NAME ${test_name} COMMAND ${test_name}_test
-                res/fonts/zen-bold.bfn res/fonts/mplus-bold.bfn res/fonts/fira-bold.bfn)
+                res/fonts/zen-bold.bfn res/fonts/mplus-bold.bfn res/fonts/fira-bold.bfn res/fonts/alegreya-medium.bfn)
         else ()
             add_test(NAME ${test_name} COMMAND ${test_name}_test)
         endif ()
         set_tests_properties(${test_name} PROPERTIES WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
     endforeach()
+    if (APPLE)
+        foreach(platform IN ITEMS ios tvos)
+            add_executable(update_service_${platform}_test tests/update_service_${platform}_test.cpp)
+            target_compile_features(update_service_${platform}_test PRIVATE cxx_std_20)
+            target_compile_options(update_service_${platform}_test PRIVATE -UNDEBUG)
+            target_include_directories(update_service_${platform}_test PRIVATE src "${DUSK_DIR}/sdk/include")
+            add_test(NAME update_service_${platform} COMMAND update_service_${platform}_test)
+        endforeach()
+    endif()
     target_sources(hud_settings_test PRIVATE src/config.cpp src/ui.cpp)
+    target_compile_definitions(hud_settings_test PRIVATE TWILIGHT_HD_HUD_NO_UPDATE_SERVICE=1)
 endif ()

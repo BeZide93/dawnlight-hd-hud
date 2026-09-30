@@ -139,7 +139,15 @@ static ModResult window(ModContext*, const UiWindowDesc* desc, UiWindowHandle* h
     assert(controls[6].option_count == 2);
     assert(std::string(controls[6].options[0]) == "TPHD Bank");
     assert(std::string(controls[6].options[1]) == "Original Wheel");
-    assert(controls.size() == 11);
+    assert(controls.size() == 14);
+    assert(controls[5].option_count == 5);
+    saved["text-font"] = 4;
+    assert(text_font() == TextFont::AlegreyaSansMedium);
+    saved["text-font"] = 0;
+    assert(map_left_enabled() && map_right_enabled() && !combined_map_control());
+    saved["map-dpad-left"] = 0;
+    assert(!map_left_enabled());
+    saved["map-dpad-left"] = 1;
     for (int i = 0; i < 3; ++i) {
         assert(controls[8 + i].kind == UI_CONTROL_TOGGLE);
         assert(controls[8 + i].config_var == feature_config_var(static_cast<Feature>(i)));

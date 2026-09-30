@@ -15,6 +15,7 @@
 #include "hud_visibility.hpp"
 #include "input_gate.hpp"
 #include "menu_shortcuts.hpp"
+#include "dpad_map_policy.hpp"
 #include "map_touch_portals.hpp"
 #include "menu_input_state.hpp"
 #include "dungeon_map_input.hpp"
@@ -811,6 +812,17 @@ FollowDpadLayout follow_dpad_layout() {
         break;
     }
     return layout;
+}
+
+DpadMapMasks active_map_masks() {
+    const bool fixed = controller_compatibility() == ControllerCompatibility::FixedTphd;
+    const auto layout = follow_dpad_layout();
+    return dpad_map_masks(fixed ? PAD_BUTTON_UP : game_button_for_dpad_direction(layout.map),
+        fixed ? PAD_BUTTON_LEFT | PAD_BUTTON_RIGHT : game_button_for_dpad_direction(layout.minimap),
+        !fixed && layout.combinedMapAndMinimap, combined_map_control(),
+        map_left_enabled(), map_right_enabled(),
+        fixed ? 0u : game_button_for_dpad_direction(layout.midna),
+        PAD_BUTTON_UP, PAD_BUTTON_LEFT, PAD_BUTTON_RIGHT);
 }
 
 bool use_tphd_dpad_map_bindings() {
@@ -4683,7 +4695,9 @@ void draw_tphd_map_icon(dMeter2Draw_c* meter) {
     }
     const bool fixedTphdBindings =
         controller_compatibility() == ControllerCompatibility::FixedTphd;
-    const DpadDirection mapDirection = fixedTphdBindings ?
+    const auto mapControls = active_map_masks();
+    if (mapControls.map == 0) return;
+    const DpadDirection mapDirection = combined_map_control() || fixedTphdBindings ?
         DpadDirection::Up : follow_dpad_layout().map;
     if (meter == nullptr || meter->mpScreen == nullptr ||
         s_tphdMapIconPicture == nullptr || meter->mpButtonCrossParent == nullptr)
@@ -4897,7 +4911,11 @@ void apply_wii_u_dpad_style(dMeter2Draw_c* meter) {
             midna_uses_dpad_down() ? upperRowOffsetY : lowerRowOffsetY);
     }
     if (meter->mpTextM != nullptr) {
-        meter->mpTextM->scale(textScale, textScale);
+        const auto controls = active_map_masks();
+        const bool rightLabel = (!controls.combined && (controls.minimap & PAD_BUTTON_RIGHT) != 0) ||
+            (controller_compatibility() == ControllerCompatibility::FollowDusklight &&
+             follow_dpad_layout().midna == DpadDirection::Down);
+        meter->mpTextM->scale(rightLabel ? textScale : 0.0f, rightLabel ? textScale : 0.0f);
         // TPHD places the full "Minimap" label immediately to the right of
         // the cross.  Do not pull this group back over the D-Pad.
         meter->mpTextM->paneTrans(
@@ -6689,14 +6707,9 @@ struct ThirdSlotTalk {
     u8 item = dItemNo_NONE_e;
 };
 ThirdSlotTalk s_thirdSlotTalk;
-bool s_thirdSlotTalkRead = false;
 
 HookAction before_get_select_item(ModContext*, void* args, void* retval, void*) {
     const int index = mods::arg<int>(args, 0);
-    if (s_thirdSlotTalkRead && index == SELECT_ITEM_X) {
-        *static_cast<u8*>(retval) = s_thirdSlotTalk.item;
-        return HOOK_SKIP_ORIGINAL;
-    }
     if (s_baitLookupScope && index == kBaitRodAlias) {
         *static_cast<u8*>(retval) = resolved_select_item(kZItemSlot);
         return HOOK_SKIP_ORIGINAL;
@@ -6753,14 +6766,11 @@ void after_pad_read(ModContext*, void*, void*, void*) {
     // directly instead of racing that synchronization.
     const bool fixedMapAvailable = use_tphd_dpad_map_bindings() && gameplayShortcuts;
     const FollowDpadLayout followLayout = follow_dpad_layout();
-    const u32 mapMask = fixedTphdBindings ? PAD_BUTTON_UP :
-        game_button_for_dpad_direction(followLayout.map);
-    const u32 minimapMask = fixedTphdBindings ?
-        (PAD_BUTTON_LEFT | PAD_BUTTON_RIGHT) :
-        game_button_for_dpad_direction(followLayout.minimap);
+    const auto mapControls = active_map_masks();
+    const u32 mapMask = mapControls.map;
+    const u32 minimapMask = mapControls.minimap;
     const u32 originalPressed = pad.mPressedButtonFlags;
-    const bool combinedMapAndMinimap = !fixedTphdBindings &&
-        followLayout.combinedMapAndMinimap;
+    const bool combinedMapAndMinimap = mapControls.combined;
     const bool touchItemsTriggered = s_touchInput.items_triggered() &&
         (originalPressed & PAD_BUTTON_UP) != 0;
     s_combinedMapMinimapTrig = fixedMapAvailable &&
@@ -6951,8 +6961,19 @@ HookAction before_meter_map_ctrl_show(ModContext*, void* args, void*, void*) {
 
     // Skip native dispatch for consumed inputs; otherwise a custom Open Map
     // binding can also fire when this hook handles the minimap shortcut.
+    bool releasedNativeMap = false;
+    if (s_getActionBindButton != nullptr && s_getActionBindTrig != nullptr &&
+        dMeter2Info_getPauseStatus() == 0) {
+        const auto released = active_map_masks().released;
+        for (auto action : {DusklightActionBind::OpenMapScreen, DusklightActionBind::ToggleMinimap}) {
+            const auto boundDirection = game_button_for_dpad_direction(
+                dpad_direction_for_native_button(s_getActionBindButton(action, PAD_1)));
+            releasedNativeMap |= (boundDirection & released) != 0 &&
+                s_getActionBindTrig(action, PAD_1);
+        }
+    }
     return (openMap || toggleMinimap || combinedMapMinimap ||
-        followMidnaDpadTrigger) ?
+        followMidnaDpadTrigger || releasedNativeMap) ?
         HOOK_SKIP_ORIGINAL : HOOK_CONTINUE;
 }
 
@@ -8938,6 +8959,8 @@ void after_fmap_explain_draw(ModContext*, void* args, void*, void*) {
     s_fmapExplainDraw = {};
 }
 
+void hide_minimap_on_combined_close();
+
 HookAction before_fmap_next_status(ModContext*, void* args, void*, void*) {
     s_fmapCloseInjected = false;
     auto* map = mods::arg<dMenu_Fmap_c*>(args, 0);
@@ -8948,6 +8971,7 @@ HookAction before_fmap_next_status(ModContext*, void* args, void*, void*) {
         // Invoke the native map-close path only at its status check, AFTER
         // cursor movement. It owns the close sound, slide and minimap restore.
         pad.mPressedButtonFlags |= PAD_BUTTON_LEFT;
+        if (combined_map_control()) hide_minimap_on_combined_close();
         s_fmapCloseInjected = true;
     }
     return HOOK_CONTINUE;
@@ -8968,6 +8992,7 @@ HookAction before_dmap_next_status(ModContext*, void* args, void* retval, void*)
     if (map != nullptr && map == s_dmapInputScope && s_dmapBackTriggered &&
         !s_inputGate.blocked() && !map->isKeyCheck()) {
         // Use native close/minimap restoration, including its sound and animation.
+        if (combined_map_control()) hide_minimap_on_combined_close();
         *static_cast<u8*>(retval) = 1;
         return HOOK_SKIP_ORIGINAL;
     }
@@ -10371,12 +10396,13 @@ HookAction before_item_action_trigger(ModContext*, void* args, void* retval, voi
 }
 
 MinimapReturnState s_minimapReturnState;
+void hide_minimap_on_combined_close() { s_minimapReturnState.choose(false); }
 dMw_c* s_minimapReturnWindow = nullptr;
 dMeterMap_c* s_minimapReturnMeter = nullptr;
 
 void preserve_map_minimap_preference(dMw_c* window) {
     auto* meter = dMeter2Info_getMeterMapClass();
-    const bool active = window != nullptr &&
+    const bool active = feature_enabled(Feature::DpadShortcuts) && window != nullptr &&
         ((window->mMenuProc >= dMw_c::FMAP_OPEN && window->mMenuProc <= dMw_c::FMAP_CLOSE) ||
          (window->mMenuProc >= dMw_c::DMAP_OPEN && window->mMenuProc <= dMw_c::DMAP_CLOSE));
     // Do not carry a snapshot across a reset, warp/scene change, or new meter.
@@ -10782,26 +10808,39 @@ HookAction before_order_talk(ModContext*, void* args, void* retval, void*) {
     return HOOK_SKIP_ORIGINAL;
 }
 
-HookAction before_talk_item_check(ModContext*, void* args, void*, void*) {
+HookAction before_talk_item_check(ModContext*, void* args, void* retval, void*) {
+    auto* events = mods::arg<dEvt_control_c*>(args, 0);
     auto* order = mods::arg<dEvt_order_c*>(args, 1);
-    s_thirdSlotTalkRead = order != nullptr && s_thirdSlotTalk.player != nullptr &&
-        order == s_thirdSlotTalk.order &&
-        order->mEventType == dEvt_type_SHOWITEM_X_e &&
-        order->mpRequestActor == s_thirdSlotTalk.player &&
-        order->mpTargetActor == s_thirdSlotTalk.target;
-    return HOOK_CONTINUE;
-}
+    if (events == nullptr || order == nullptr || s_thirdSlotTalk.player == nullptr ||
+        order != s_thirdSlotTalk.order || order->mEventType != dEvt_type_SHOWITEM_X_e ||
+        order->mpRequestActor != s_thirdSlotTalk.player ||
+        order->mpTargetActor != s_thirdSlotTalk.target) return HOOK_CONTINUE;
 
-void after_talk_item_check(ModContext*, void*, void*, void*) {
-    if (s_thirdSlotTalkRead) s_thirdSlotTalk = {};
-    s_thirdSlotTalkRead = false;
+    // Preserve native event validation and NPC dispatch, but supply the
+    // captured R item directly. Nested getSelectItem hooks are not reliable
+    // when the host compiler inlines the selected-item read.
+    const u8 item = s_thirdSlotTalk.item;
+    s_thirdSlotTalk = {};
+    events->mTalkXyType = 1;
+    int result = 0;
+    if (item != dItemNo_NONE_e && order->mpTargetActor != nullptr &&
+        order->mpTargetActor->eventInfo.chkCondition(dEvtCnd_CANTALKITEM_e) &&
+        events->commonCheck(order, dEvtCnd_CANTALK_e, dEvtCmd_INTALK_e)) {
+        events->mMode = dEvt_mode_TALK_e;
+        events->mPreItemNo = item;
+        auto& manager = dComIfGp_getEventManager();
+        events->mEventId = manager.getEventIdx("DEFAULT_TALK_XY", 0xFF, -1);
+        manager.order(events->mEventId);
+        result = 1;
+    }
+    *static_cast<int*>(retval) = result;
+    return HOOK_SKIP_ORIGINAL;
 }
 
 void after_talk_queue_entry(ModContext*, void*, void*, void*) {
     // The native queue is drained even when a higher-priority event wins.
     // Never let a discarded Z presentation affect a later X interaction.
     s_thirdSlotTalk = {};
-    s_thirdSlotTalkRead = false;
 }
 
 void after_player_execute(ModContext*, void* args, void*, void*) {
@@ -11267,7 +11306,6 @@ void shutdown_face_button_textures() {
 void shutdown_item_slot_resources() {
     s_baitLookupScope = false;
     s_thirdSlotTalk = {};
-    s_thirdSlotTalkRead = false;
     destroy_item_bank();
     s_activeItemExplanation = nullptr;
     s_itemHelpText.clear();
@@ -11635,7 +11673,6 @@ ModResult install_item_slot_hooks(ModError* error) {
         ADD_PRE(FishingFoodInitHook, before_fishing_food_init, "third-slot bait initialization");
         ADD_PRE(OrderTalkHook, before_order_talk, "third-slot item presentation");
         ADD_PRE(TalkItemCheckHook, before_talk_item_check, "third-slot talk item read");
-        ADD_POST(TalkItemCheckHook, after_talk_item_check, "restore talk item read");
         ADD_POST(TalkQueueEntryHook, after_talk_queue_entry, "clear third-slot presentation request");
         ADD_PRE(SetHeavyBootsHook, before_set_heavy_boots, "heavy boots toggle");
         ADD_POST(PlayerExecuteHook, after_player_execute, "player update");

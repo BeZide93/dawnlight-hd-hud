@@ -38,6 +38,7 @@ public:
         return MinimapRestore{preference_, preference_ && canDisplay};
     }
 
+    void choose(bool preference) { if (active_ && !restored_) preference_ = preference; }
     bool active() const { return active_; }
     void reset() { *this = {}; }
 

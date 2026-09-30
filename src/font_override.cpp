@@ -114,6 +114,10 @@ void initialize_font_override() {
         path = "fonts/mplus-bold.bfn";
         name = "M PLUS 2";
         break;
+    case TextFont::AlegreyaSansMedium:
+        path = "fonts/alegreya-medium.bfn";
+        name = "Alegreya Sans Medium";
+        break;
     case TextFont::FiraSans:
         path = "fonts/fira-bold.bfn";
         name = "Dusklight - Fira Sans Bold";
@@ -225,7 +229,8 @@ bool draw_font_override(void* args, void* retval, FontDrawOriginal drawOriginal)
     replacement->getWidthEntry(code, &replacementWidth);
     const float rasterScale = mapHeading ? font_atlas::opticalScale :
         (mapPrompt || itemPrompt || s_activeFont == TextFont::FiraSans ?
-        font_atlas::firaOpticalScale : font_atlas::opticalScale);
+        font_atlas::firaOpticalScale : (s_activeFont == TextFont::AlegreyaSansMedium ?
+        font_atlas::alegreyaOpticalScale : font_atlas::opticalScale));
     const bool itemStem = itemPrompt &&
         (code == 'i' || code == 'j' || code == 'l' || code == 'I');
     // Ruby's narrow stem advances must not horizontally squash the bold

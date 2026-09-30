@@ -15,3 +15,5 @@ These are modified font resources, not the canonical upstream font distributions
 The mod replaces standard message-font drawing only. Original glyph advances,
 line-break calculations, and original font ownership are unchanged. Decorative
 fonts and unsupported glyphs continue to use the original game assets.
+
+- `alegreya-medium.bfn`: derived from Alegreya Sans Medium, weight 500, with a 52-pixel cap height.

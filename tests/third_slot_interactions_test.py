@@ -7,13 +7,15 @@ def section(start, end):
 
 lookup = section("HookAction before_get_select_item(", "void after_set_select_item(")
 assert "s_baitLookupScope && index == kBaitRodAlias" in lookup
-assert "s_thirdSlotTalkRead && index == SELECT_ITEM_X" in lookup
+assert "s_thirdSlotTalkRead" not in lookup
 talk = section("HookAction before_order_talk(", "void after_player_execute(")
 assert "link->checkWolf()" in talk and "link->notTalk()" in talk
 assert "link->checkRequestTalkActor" in talk
-assert "order == s_thirdSlotTalk.order" in talk
-assert "order->mpRequestActor == s_thirdSlotTalk.player" in talk
-assert "order->mpTargetActor == s_thirdSlotTalk.target" in talk
+assert "order != s_thirdSlotTalk.order" in talk
+assert "order->mpRequestActor != s_thirdSlotTalk.player" in talk
+assert "order->mpTargetActor != s_thirdSlotTalk.target" in talk
+assert "events->mPreItemNo = item" in talk
+assert "events->commonCheck(order, dEvtCnd_CANTALK_e, dEvtCmd_INTALK_e)" in talk
 assert "void after_talk_queue_entry" in talk
 assert "setSelectItemIndex" not in talk
 bait = section("HookAction before_fishing_food_init(", "HookAction before_order_talk(")

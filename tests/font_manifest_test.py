@@ -11,6 +11,6 @@ for entry in manifest.values():
     source = root / "tools/font_sources" / entry["source_file"]
     assert hashlib.sha256(atlas.read_bytes()).hexdigest() == entry["atlas_sha256"], atlas.name
     assert hashlib.sha256(source.read_bytes()).hexdigest() == entry["source_sha256"], source.name
-for name in ("Fira-Sans", "M-PLUS-2", "Zen-Kaku-Gothic-New"):
+for name in ("Fira-Sans", "M-PLUS-2", "Zen-Kaku-Gothic-New", "Alegreya-Sans"):
     assert "SIL OPEN FONT LICENSE" in (fonts / f"OFL-{name}.txt").read_text()
-print("PASS: font source and atlas checksums; all three font licenses present")
+print("PASS: font source and atlas checksums; all four font licenses present")

@@ -1,5 +1,15 @@
 # Changelog
 
+## v2.5.0 - Unreleased
+
+- Restore independent GitHub update checks and confirmed installation on desktop and Android.
+- Keep iOS and tvOS updates notice-only; native updates require a bundled and signed app.
+- Verify release package size and SHA-256 before replacement.
+- Resolve R-slot item presentation directly in the native NPC event instead of substituting an X-slot read.
+- Restore native minimap close/hide behavior when D-Pad shortcuts are disabled.
+- Add independent Left/Right map controls and a combined Up map/minimap cycle.
+- Add Alegreya Sans Medium to the font selection.
+
 ## v2.4.4 - 2026-09-24
 
 - Improved menu prompt sizing and alignment.

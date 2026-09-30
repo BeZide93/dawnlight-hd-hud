@@ -23,6 +23,10 @@ ConfigVarHandle s_minimapSize = 0;
 ConfigVarHandle s_textFont = 0;
 ConfigVarHandle s_itemsScreen = 0;
 ConfigVarHandle s_swapMenuButtons = 0;
+ConfigVarHandle s_checkForUpdates = 0;
+ConfigVarHandle s_mapLeft = 0;
+ConfigVarHandle s_mapRight = 0;
+ConfigVarHandle s_combinedMap = 0;
 std::array<ConfigVarHandle, 3> s_featureHandles{};
 std::array<bool, 3> s_activeFeatures{true, true, true};
 
@@ -126,7 +130,11 @@ ModResult register_config(ModError* error) {
         register_int("minimap-percent", 100, s_minimapSize) != MOD_OK ||
         register_int("text-font", 0, s_textFont) != MOD_OK ||
         register_int("items-screen", 0, s_itemsScreen) != MOD_OK ||
-        register_menu_swap() != MOD_OK)
+        register_menu_swap() != MOD_OK ||
+        register_bool("check-for-updates", true, s_checkForUpdates) != MOD_OK ||
+        register_bool("map-dpad-left", true, s_mapLeft) != MOD_OK ||
+        register_bool("map-dpad-right", true, s_mapRight) != MOD_OK ||
+        register_bool("combined-map-control", false, s_combinedMap) != MOD_OK)
     {
         return mods::set_error(
             error, MOD_ERROR, "failed to register Twilight HD settings");
@@ -225,7 +233,7 @@ ConfigVarHandle controller_compatibility_config_var() {
 
 TextFont text_font() {
     const auto value = get_int(s_textFont, 0);
-    if (value < 0 || value > static_cast<int64_t>(TextFont::FiraSans)) {
+    if (value < 0 || value > static_cast<int64_t>(TextFont::AlegreyaSansMedium)) {
         return TextFont::Original;
     }
     return static_cast<TextFont>(value);
@@ -255,5 +263,20 @@ ConfigVarHandle swap_menu_buttons_config_var() {
     return s_swapMenuButtons;
 }
 
+namespace {
+bool get_bool(ConfigVarHandle handle, bool fallback) {
+    bool value = fallback;
+    if (handle != 0) svc_config->get_bool(mod_ctx, handle, &value);
+    return value;
+}
+}
+bool check_for_updates_enabled() { return get_bool(s_checkForUpdates, true); }
+bool map_left_enabled() { return get_bool(s_mapLeft, true); }
+bool map_right_enabled() { return get_bool(s_mapRight, true); }
+bool combined_map_control() { return get_bool(s_combinedMap, false); }
+ConfigVarHandle check_for_updates_config_var() { return s_checkForUpdates; }
+ConfigVarHandle map_left_config_var() { return s_mapLeft; }
+ConfigVarHandle map_right_config_var() { return s_mapRight; }
+ConfigVarHandle combined_map_config_var() { return s_combinedMap; }
 
 }  // namespace twilight_hd_hud

@@ -21,3 +21,10 @@ Python with Pillow/FreeType. It generates and validates the BFN resources and a
 manifest recording the source/derived hashes, weight, and raster dimensions.
 
 No proprietary glyphs, original font tables, or game files are used by the generator.
+
+Alegreya Sans Medium was downloaded from the official Google Fonts repository on
+2026-09-30: https://raw.githubusercontent.com/google/fonts/main/ofl/alegreyasans/AlegreyaSans-Medium.ttf
+SHA-256: `4b89fe7804fd1485ec2757795a53ffdb66e1206dd56f844c2d72b3c944815b43`.
+Its original copyright and SIL OFL notice is included in `res/fonts/OFL-Alegreya-Sans.txt`.
+The Medium face uses weight 500 and a 52-pixel atlas cap height to accommodate
+accented capitals and descenders; the runtime normalizes its visible size.

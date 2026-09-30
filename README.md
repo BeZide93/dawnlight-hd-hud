@@ -51,7 +51,7 @@ Download from [Releases](../../releases/latest):
 - **Twilight-HD-HUD.dusk:** Windows x64/ARM64, Linux x64/ARM64, macOS Intel/Apple Silicon, Android ARM64, and iOS ARM64. 
 - **Twilight-HD-HUD-tvOS.dusk:** Apple TV only.
 
-Starting with v2.4.0, legacy updater packages are no longer provided. Use Dusklight's Online mods to update, or install the appropriate package above manually. Install only one package. Apple mobile devices still require the bundling and signing steps below.
+Install only one package. Desktop and Android can check and install GitHub releases through the mod's updater. Apple mobile devices require the bundling and signing steps below.
 
 ## Installation: Windows, Linux, macOS, and Android
 
@@ -113,7 +113,15 @@ unsigned package into the writable `mods` folder is not sufficient.
 Install a signed Dusklight app build containing the desired Twilight HD version,
 then enable the mod and choose your button-label layout and HUD size.
 
-Updates are managed through Dusklight's built-in Online mods interface.
+The mod's panel includes **Auto Update Checks** and **Check Now**. It checks this
+repository's GitHub releases independently of mod-site update services. Desktop
+and Android offer **Update Now** when a newer stable release is available. The
+updater verifies the release asset's size and SHA-256 before replacing one known
+Twilight HD package; restart Dusklight to load the new version. Renamed or duplicate
+packages require manual installation. Offline checks leave the mod usable.
+
+iOS and tvOS support **update notices only**. They never download or replace the
+native mod themselves; install a newly bundled and signed Dusklight app instead.
 Twilight HD no longer performs its own GitHub checks or displays separate update controls.
 On iOS and tvOS, native-code updates still require an updated signed Dusklight app
 containing the newer mod; the catalog cannot install native code on those platforms.
@@ -205,3 +213,17 @@ Their copyright notices, licenses, and conversion details are included in
 [res/fonts](res/fonts/README.md). They are open-font conversions, not TPHD font dumps.
 
 Twilight Princess, its characters, and its original assets are properties of Nintendo. This is an unofficial fan project and is not affiliated with or endorsed by Nintendo or the Dusklight developers.
+
+## Map controls
+
+With D-Pad Shortcuts enabled, **Map / Minimap on D-Pad Left** and **Map / Minimap
+on D-Pad Right** independently release those directions from this mod's map
+handling. **Combine Map / Minimap on Up** releases both side directions: Up
+shows the minimap, opens the full map, then closes it and hides the minimap.
+Closing with B preserves the previous minimap preference. A dedicated Midna
+assignment takes priority; move Midna off Up to use the combined control.
+Other configured Midna and Collection actions still retain their own directions.
+With D-Pad Shortcuts disabled, native map close/hide behavior controls visibility.
+
+The **Text Font** setting also includes **Alegreya Sans Medium**. Restart Dusklight
+after changing the font.

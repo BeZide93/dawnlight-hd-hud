@@ -16,6 +16,7 @@ constexpr int side = cell * 16;
 // not their padded texture cell, to 75% of the game's requested font height.
 constexpr float opticalScale = 0.75f * cell / 65;
 constexpr float firaOpticalScale = 0.75f * cell / 57;
+constexpr float alegreyaOpticalScale = 0.75f * cell / 52;
 constexpr std::size_t textureBytes = side * side / 2;
 constexpr std::size_t infOffset = 32;
 constexpr std::size_t widOffset = 64;

@@ -9,7 +9,7 @@
 using namespace twilight_hd_hud::font_atlas;
 
 int main(int argc, char** argv) {
-    assert(argc == 4);
+    assert(argc == 5);
     for (int i = 1; i < argc; ++i) {
         std::ifstream stream(argv[i], std::ios::binary);
         std::vector<unsigned char> bytes((std::istreambuf_iterator<char>(stream)), {});
@@ -49,6 +49,7 @@ int main(int argc, char** argv) {
     assert(!supported(0x82a0));
     assert(std::abs(65 * opticalScale / cell - 0.75f) < .00001f);
     assert(std::abs(57 * firaOpticalScale / cell - 0.75f) < .00001f);
+    assert(std::abs(52 * alegreyaOpticalScale / cell - 0.75f) < .00001f);
     // Match the native drawChar_scale return formula across both first/subsequent
     // character paths and fixed-width rendering. No changes to line-wrap inputs.
     for (bool fixed : {false, true}) for (bool flag : {false, true})
@@ -57,7 +58,7 @@ int main(int argc, char** argv) {
         float expected = 22 * (scale / 24);
         if (!fixed) expected = (width + (flag ? 0 : bearing)) * (scale / 24);
         assert(advance(fixed, 22, flag, bearing, width, scale, 24) == expected);
-        for (float rasterScale : {opticalScale, firaOpticalScale})
+        for (float rasterScale : {opticalScale, firaOpticalScale, alegreyaOpticalScale})
         for (int newWidth : {0, 30, 65, 110}) {
             const auto p = place(100, scale, 24, bearing, width, newWidth, fixed, 22, flag, rasterScale);
             assert(std::isfinite(p.x) && std::isfinite(p.scaleX));
@@ -65,5 +66,5 @@ int main(int argc, char** argv) {
             assert(newWidth * p.scaleX / cell <= (fixed ? 22 : width) * scale / 24 + .0001f);
         }
     }
-    std::cout << "PASS: all three atlases, malformed resources, coverage, native advances, glyph fitting\n";
+    std::cout << "PASS: all four atlases, malformed resources, coverage, native advances, glyph fitting\n";
 }
