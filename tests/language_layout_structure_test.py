@@ -22,7 +22,7 @@ for label in ('Options', 'Brightness', 'DeviceSettings', 'Complete', 'DisplayIns
 assert 'textBounds' not in prompt  # Callers reserve text space, without texture padding.
 assert '"Make the adjustments on the device."' not in source
 
-flipped = source.split('if (layout == ButtonLayout::BayxFlipped)', 1)[1].split('} else if', 1)[0]
+flipped = source.split('if (layout == ButtonLayout::BayxFlipped || layout == ButtonLayout::SteamDeck)', 1)[1].split('} else if', 1)[0]
 assert "MULTI_CHAR('x_btn'), styled_face_button_texture('X')" in flipped
 assert "MULTI_CHAR('y_btn'), styled_face_button_texture('Y')" in flipped
 positions = source.split('void apply_flipped_diamond_positions(', 1)[1].split('void apply_button_layout_preference(', 1)[0]
@@ -32,7 +32,7 @@ for slot in (0, 1):
 assert 'y.x - x.x, y.y - x.y' in positions
 assert 'x.x - y.x, x.y - y.y' in positions
 assert 'restore_archive_pane(meter->mpBTextXY[i])' in source
-assert 'if (button_layout() != ButtonLayout::BayxFlippedBotw) return;' in positions
+assert 'if (!has_flipped_botw_items(button_layout())) return;' in positions
 assert 'if (!botw)' in positions  # Do not swap Attack/Action a second time.
 assert 'if (button_layout() == ButtonLayout::PlayStationSwapped) return;' in positions
 print('PASS: native localized labels, single-row assignment, footer layers, and full X/Y HUD groups')

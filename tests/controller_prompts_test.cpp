@@ -20,6 +20,30 @@ struct LiteralTextBox {
 };
 
 int main() {
+    // Deck keeps the established flipped face layout but uses numbered shoulders.
+    for (char action : {'A', 'B', 'X', 'Y'}) {
+        assert(face_letter_for_action(ButtonLayout::SteamDeck, action) ==
+            face_letter_for_action(ButtonLayout::BayxFlipped, action));
+        assert(face_position_for_action(ButtonLayout::SteamDeckBotw, action) ==
+            face_position_for_action(ButtonLayout::BayxFlippedBotw, action));
+        assert(face_letter_for_action(ButtonLayout::SteamDeckBotw, action) ==
+            face_letter_for_action(ButtonLayout::BayxFlippedBotw, action));
+    }
+    for (auto layout : {ButtonLayout::SteamDeck, ButtonLayout::SteamDeckBotw}) {
+        assert(is_steam_deck_layout(layout));
+        assert(!uses_xbox_prompts(layout) && !is_playstation_layout(layout));
+        assert(std::string(item_combo_button_label(layout)) == "L2");
+    }
+    for (auto layout : {ButtonLayout::PlayStationBotw, ButtonLayout::PlayStationFlippedBotw}) {
+        assert(is_playstation_layout(layout) && is_botw_layout(layout));
+        assert(face_position_for_action(layout, 'A') == 'B'); // Cross, South
+        assert(face_position_for_action(layout, 'B') == 'Y'); // Square, West
+        assert(std::string(item_combo_button_label(layout)) == "L2");
+    }
+    assert(face_position_for_action(ButtonLayout::PlayStationBotw, 'X') == 'X');
+    assert(face_position_for_action(ButtonLayout::PlayStationBotw, 'Y') == 'A');
+    assert(face_position_for_action(ButtonLayout::PlayStationFlippedBotw, 'X') == 'A');
+    assert(face_position_for_action(ButtonLayout::PlayStationFlippedBotw, 'Y') == 'X');
     const auto psFlipped = ButtonLayout::PlayStationFlipped;
     assert(is_playstation_layout(psFlipped));
     assert(!uses_xbox_prompts(psFlipped) && !is_botw_layout(psFlipped));

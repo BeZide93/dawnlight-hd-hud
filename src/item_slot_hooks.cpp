@@ -1456,7 +1456,7 @@ ResTIMG const* styled_r_button_texture() {
     if (uses_xbox_prompts(button_layout())) {
         return xbox_shoulder_button_texture(ShoulderPrompt::R);
     }
-    if (is_playstation_layout(button_layout())) {
+    if (is_playstation_layout(button_layout()) || is_steam_deck_layout(button_layout())) {
         return playstation_shoulder_button_texture(1); // R1
     }
     if (uses_dark_buttons(button_style())) {
@@ -1471,7 +1471,7 @@ ResTIMG const* styled_l_button_texture() {
     if (uses_xbox_prompts(button_layout())) {
         return xbox_shoulder_button_texture(ShoulderPrompt::L);
     }
-    if (is_playstation_layout(button_layout())) {
+    if (is_playstation_layout(button_layout()) || is_steam_deck_layout(button_layout())) {
         const int style = uses_dark_buttons(button_style()) ? 1 : 0;
         return resource_texture(s_playStationL1ButtonResources[style]);
     }
@@ -1487,7 +1487,7 @@ ResTIMG const* styled_zl_button_texture() {
     if (uses_xbox_prompts(button_layout())) {
         return xbox_shoulder_button_texture(ShoulderPrompt::Zl);
     }
-    if (is_playstation_layout(button_layout())) {
+    if (is_playstation_layout(button_layout()) || is_steam_deck_layout(button_layout())) {
         return playstation_shoulder_button_texture(0); // L2
     }
     if (uses_dark_buttons(button_style())) {
@@ -1502,7 +1502,7 @@ ResTIMG const* styled_zr_button_texture() {
     if (uses_xbox_prompts(button_layout())) {
         return xbox_shoulder_button_texture(ShoulderPrompt::Zr);
     }
-    if (is_playstation_layout(button_layout())) {
+    if (is_playstation_layout(button_layout()) || is_steam_deck_layout(button_layout())) {
         return playstation_shoulder_button_texture(2); // R2
     }
     if (uses_dark_buttons(button_style())) {
@@ -1528,6 +1528,10 @@ ResTIMG const* styled_blank_face_button_texture() {
 }
 
 ResTIMG const* menu_face_button_texture(const bool nativeAAction) {
+    if (is_playstation_layout(button_layout())) {
+        return playstation_face_button_texture(face_position_for_action(
+            button_layout(), nativeAAction ? 'A' : 'B'));
+    }
     if (is_botw_layout(button_layout())) {
         return is_universal_layout(button_layout()) ? styled_blank_face_button_texture() :
             styled_face_button_texture(face_letter_for_action(button_layout(), nativeAAction ? 'A' : 'B'));
@@ -1538,6 +1542,7 @@ ResTIMG const* menu_face_button_texture(const bool nativeAAction) {
     switch (button_layout()) {
     case ButtonLayout::Nintendo:
     case ButtonLayout::BayxFlipped:
+    case ButtonLayout::SteamDeck:
         return nativeAAction ? buttonA : buttonB;
     case ButtonLayout::Xbox:
         // The actions retain their original positions. Only the printed
@@ -1556,6 +1561,10 @@ ResTIMG const* menu_face_button_texture(const bool nativeAAction) {
 }
 
 ResTIMG const* item_assignment_button_texture(const bool nativeXButton) {
+    if (is_playstation_layout(button_layout())) {
+        return playstation_face_button_texture(face_position_for_action(
+            button_layout(), nativeXButton ? 'X' : 'Y'));
+    }
     if (is_botw_layout(button_layout())) {
         return is_universal_layout(button_layout()) ? styled_blank_face_button_texture() :
             styled_face_button_texture(face_letter_for_action(button_layout(), nativeXButton ? 'X' : 'Y'));
@@ -1563,6 +1572,7 @@ ResTIMG const* item_assignment_button_texture(const bool nativeXButton) {
     switch (button_layout()) {
     case ButtonLayout::Nintendo:
     case ButtonLayout::BayxFlipped:
+    case ButtonLayout::SteamDeck:
         return styled_face_button_texture(nativeXButton ? 'X' : 'Y');
     case ButtonLayout::Xbox:
         return styled_face_button_texture(nativeXButton ? 'Y' : 'X');
@@ -3973,6 +3983,7 @@ JGeometry::TBox2<f32> collection_submenu_global_bounds(J2DPane* pane) {
 void apply_flipped_diamond_positions(dMeter2Draw_c* meter) {
     const bool botw = is_botw_layout(button_layout());
     if ((!botw && button_layout() != ButtonLayout::BayxFlipped &&
+            button_layout() != ButtonLayout::SteamDeck &&
             button_layout() != ButtonLayout::PlayStationSwapped &&
             button_layout() != ButtonLayout::PlayStationFlipped) || meter == nullptr ||
         meter->mpScreen == nullptr || meter->mpButtonA == nullptr ||
@@ -4001,7 +4012,7 @@ void apply_flipped_diamond_positions(dMeter2Draw_c* meter) {
         // Counts, oil gauges and combo attachments follow mpItemXY's final bounds.
         // The flipped variant additionally exchanges the North/East items.
         // R and all shoulder prompts remain untouched.
-        if (button_layout() != ButtonLayout::BayxFlippedBotw) return;
+        if (!has_flipped_botw_items(button_layout())) return;
     }
     if (!botw) {
         offset_diamond_group<J2DPane, 3>({pane_ptr(meter->mpButtonA), pane_ptr(meter->mpTextA), nullptr},
@@ -4050,7 +4061,7 @@ void apply_button_layout_preference(dMeter2Draw_c* meter) {
         return;
     }
 
-    if (layout == ButtonLayout::BayxFlipped) {
+    if (layout == ButtonLayout::BayxFlipped || layout == ButtonLayout::SteamDeck) {
         // All four native actions retain their letters; the complete groups
         // move to Xbox's physical positions in apply_flipped_diamond_positions.
         set_face_button_texture(meter, MULTI_CHAR('a_btn'), buttonA);

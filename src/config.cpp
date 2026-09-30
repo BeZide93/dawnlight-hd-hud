@@ -160,7 +160,7 @@ ConfigVarHandle feature_config_var(Feature feature) {
 ButtonLayout button_layout() {
     const int64_t value = get_int(s_buttonLayout, static_cast<int64_t>(ButtonLayout::Nintendo));
     if (value < static_cast<int64_t>(ButtonLayout::Nintendo) ||
-        value > static_cast<int64_t>(ButtonLayout::PlayStationFlipped))
+        value > static_cast<int64_t>(ButtonLayout::SteamDeckBotw))
     {
         return ButtonLayout::Nintendo;
     }

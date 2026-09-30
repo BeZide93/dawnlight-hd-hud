@@ -18,7 +18,7 @@ constexpr char face_position_for_action(ButtonLayout layout, char action) {
     if (layout == ButtonLayout::PlayStationSwapped || layout == ButtonLayout::PlayStationFlipped)
         return action == 'A' ? 'B' : action == 'B' ? 'A' : action;
     if (!is_botw_layout(layout)) return action;
-    if (layout == ButtonLayout::BayxFlippedBotw) {
+    if (has_flipped_botw_items(layout)) {
         if (action == 'X') return 'A'; // East item
         if (action == 'Y') return 'X'; // North item
     }
@@ -29,7 +29,7 @@ constexpr char face_letter_for_action(ButtonLayout layout, char action) {
     const char position = face_position_for_action(layout, action);
     // Preserve the established flipped preset's menu/instruction labels.
     if (layout == ButtonLayout::Xbox || layout == ButtonLayout::XboxBotw ||
-        layout == ButtonLayout::BayxFlippedBotw)
+        layout == ButtonLayout::BayxFlippedBotw || layout == ButtonLayout::SteamDeckBotw)
         return position == 'A' ? 'B' : position == 'B' ? 'A' :
             position == 'X' ? 'Y' : position == 'Y' ? 'X' : position;
     return position;
@@ -47,7 +47,7 @@ inline constexpr const char* kXboxShoulderPaths[2][4] = {
 
 constexpr const char* item_combo_button_label(ButtonLayout layout) {
     return uses_xbox_prompts(layout) ? "LT" :
-        is_playstation_layout(layout) ? "L2" : "ZL";
+        (is_playstation_layout(layout) || is_steam_deck_layout(layout)) ? "L2" : "ZL";
 }
 
 template <typename TextBox>

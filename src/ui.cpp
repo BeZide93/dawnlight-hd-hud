@@ -101,7 +101,9 @@ constexpr ButtonLayout kLayoutOrder[] = {ButtonLayout::Nintendo, ButtonLayout::N
     ButtonLayout::Xbox, ButtonLayout::BayxFlipped, ButtonLayout::XboxBotw,
     ButtonLayout::BayxFlippedBotw,
     ButtonLayout::Universal, ButtonLayout::UniversalBotw, ButtonLayout::PlayStation,
-    ButtonLayout::PlayStationSwapped, ButtonLayout::PlayStationFlipped};
+    ButtonLayout::PlayStationSwapped, ButtonLayout::PlayStationFlipped,
+    ButtonLayout::PlayStationBotw, ButtonLayout::PlayStationFlippedBotw,
+    ButtonLayout::SteamDeck, ButtonLayout::SteamDeckBotw};
 
 void get_layout(ModContext*, void*, UiControlValue* value) {
     value->int_value = 0;
@@ -153,16 +155,21 @@ ModResult build_hud_tab(
         "BAYX Flipped (BOTW Style)",
         "Universal",
         "Universal (BOTW Style)",
-        "PlayStation",
-        "PlayStation (Cross Action)",
-        "PlayStation (Flipped)",
+        "DualSense / PlayStation",
+        "DualSense / PlayStation (Cross Action)",
+        "DualSense / PlayStation (Flipped)",
+        "DualSense (BOTW Style)",
+        "DualSense Flipped (BOTW Style)",
+        "Steam Deck",
+        "Steam Deck (BOTW Style)",
     };
     UiControlDesc layout = UI_CONTROL_DESC_INIT;
     layout.kind = UI_CONTROL_SELECT;
     layout.label = "Button Layout";
     layout.help_rml = "Visual presets only; configure controller bindings in Dusklight. "
         "BOTW Style places Attack on West, Action on South, and items on North/East. "
-        "L and R are unchanged. Universal leaves face buttons blank.";
+        "Steam Deck uses flipped BAYX face buttons with L1/R1 and L2/R2. "
+        "DualSense uses PlayStation symbols. Universal leaves face buttons blank.";
     layout.options = kButtonLayouts;
     layout.option_count = std::size(kButtonLayouts);
     layout.get = get_layout;
@@ -277,15 +284,15 @@ void set_size(ModContext*, void* data, const UiControlValue* value) {
 }
 void reset_size(ModContext*, void* data) { set_hud_size_percent(size_setting(data), 100); }
 
+constexpr const char* kSizingGuide =
+    "• Enter 50–125% or use Left/Right. Changes apply live.<br/>"
+    "• Set Overall to 100% to edit individual icons. Text sizes stay independent.<br/><br/>"
+    "Hide the HUD with Dusklight's Minimal HUD setting.";
+
 ModResult build_hud_sizing_tab(
-    ModContext* ctx, UiWindowHandle, UiElementHandle left, UiElementHandle, void*, ModError*) {
+    ModContext* ctx, UiWindowHandle, UiElementHandle left, UiElementHandle right, void*, ModError*) {
     if (add_section(ctx, left, "HUD Sizing") != MOD_OK ||
-        add_text(ctx, left,
-            "Enter 50-125%, or adjust left/right in 1% steps. Changes apply live. "
-            "Overall overrides visual HUD groups unless it is 100%; text scales remain independent. "
-            "Returning to 100% restores your individual icon values. Use Dusklight's Minimal HUD "
-            "option to hide the HUD.")
-            != MOD_OK) return MOD_ERROR;
+        svc_ui->pane_add_rml(ctx, right, kSizingGuide, nullptr) != MOD_OK) return MOD_ERROR;
 
     static HudSizeSetting settings[] = {HudSizeSetting::Overall,
         HudSizeSetting::ControllerDiamond, HudSizeSetting::Dpad, HudSizeSetting::Hearts,
@@ -304,23 +311,27 @@ ModResult build_hud_sizing_tab(
         "Reset Dialogue Text to 100%",
         "Reset Rupees to 100%", "Reset Minimap to 100%",
     };
-    constexpr const char* help[] = {
-        "Any value other than 100% overrides visual HUD groups, but never text. Icon controls show "
-        "that value and are disabled. Reset Overall to restore their saved individual sizes.",
-        "Sizes the face-button/item cluster, ammo, and Wolf Link action icons without changing text. "
-        "Set Overall to 100% to edit this percentage.",
-        "Sizes the D-pad and map icon without changing labels. Set Overall to 100% to edit this percentage.",
-        "Sizes gameplay hearts, not save-menu hearts. Set Overall to 100% to edit this percentage.",
-        "Sizes bottom-center action text. 100% uses the TPHD-style size; 125% restores the previous size.",
-        "Sizes dialogue text. 100% uses the TPHD-style size.",
-        "Sizes the rupee icon and counter.",
-        "Sizes the minimap.",
-    };
+    static const std::array<std::string, 8> help = [] {
+        constexpr const char* details[] = {
+            "Overall sets all icon sizes. Returning to 100% restores your saved sizes.",
+            "Sizes buttons, items, ammo, and Wolf Link icons.",
+            "Sizes the D-Pad and map icon.",
+            "Sizes gameplay hearts; save-menu hearts keep their own size.",
+            "Sizes action text. 125% restores the previous size.",
+            "Sizes dialogue text.",
+            "Sizes the rupee icon and counter.",
+            "Sizes the minimap.",
+        };
+        std::array<std::string, 8> result;
+        for (std::size_t i = 0; i < result.size(); ++i)
+            result[i] = std::string(details[i]) + "<br/><br/>" + kSizingGuide;
+        return result;
+    }();
     for (std::size_t i = 0; i < std::size(settings); ++i) {
         UiControlDesc number = UI_CONTROL_DESC_INIT;
         number.kind = UI_CONTROL_NUMBER;
         number.label = labels[i];
-        number.help_rml = help[i];
+        number.help_rml = help[i].c_str();
         number.get = get_size;
         number.set = set_size;
         number.is_disabled = size_disabled;
@@ -335,6 +346,7 @@ ModResult build_hud_sizing_tab(
         UiControlDesc reset = UI_CONTROL_DESC_INIT;
         reset.kind = UI_CONTROL_BUTTON;
         reset.label = resetLabels[i];
+        reset.help_rml = kSizingGuide;
         reset.on_pressed = reset_size;
         reset.is_disabled = size_disabled;
         reset.user_data = &settings[i];

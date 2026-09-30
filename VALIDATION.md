@@ -11,7 +11,8 @@ Completed:
 - 26 native regression tests, including updater installation/failure handling,
   JSON/version parsing, SHA-256 known vectors, map input policy, font resources,
   and separate iOS/tvOS notice-only updater fixtures.
-- 33 Python source/resource and native-event fixture checks.
+- 34 Python source/resource and native-event fixture checks, including actual
+  Steam Deck/DualSense texture selectors with distinct native texture fixtures.
 - Package ZIP verification and Alegreya font specimen inspection.
 
 Windows compilation remains unverified: the existing local Zig/MSVC toolchain
@@ -28,7 +29,9 @@ Before publishing or closing the corresponding issues, verify in Dusklight:
 3. Enable shortcuts and test combined Up cycling and the separate layout,
    Midna on each direction, touch controls, and a second mod using released keys.
 4. Inspect Alegreya dialogue with accents and long lines in supported languages.
-5. Recheck Save, Collection, and prompts in GameCube/Wii U/Dusklight scaling modes.
+5. Inspect the HUD Sizing right-panel bullets, numbered Steam Deck shoulders,
+   and DualSense BOTW/Flipped BOTW prompts in gameplay, menus, and item assignment.
+   Recheck Save, Collection, and prompts in GameCube/Wii U/Dusklight scaling modes.
    Issue #52 already has reporter confirmation of the v2.4.4 fix.
 6. Test GitHub checks on a connected host. Desktop/Android installation requires
    a newer release, confirmation, a verified package, and a restart. iOS/tvOS

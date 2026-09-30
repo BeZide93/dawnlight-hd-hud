@@ -19,6 +19,10 @@ enum class ButtonLayout : int {
     BayxFlippedBotw = 8,
     PlayStationSwapped = 9,
     PlayStationFlipped = 10,
+    PlayStationBotw = 11,
+    PlayStationFlippedBotw = 12,
+    SteamDeck = 13,
+    SteamDeckBotw = 14,
 };
 
 enum class ButtonStyle : int {
@@ -34,16 +38,28 @@ constexpr bool uses_dark_buttons(ButtonStyle style) {
 
 constexpr bool is_playstation_layout(ButtonLayout layout) {
     return layout == ButtonLayout::PlayStation || layout == ButtonLayout::PlayStationSwapped ||
-        layout == ButtonLayout::PlayStationFlipped;
+        layout == ButtonLayout::PlayStationFlipped || layout == ButtonLayout::PlayStationBotw ||
+        layout == ButtonLayout::PlayStationFlippedBotw;
 }
 
 constexpr bool is_botw_layout(ButtonLayout layout) {
     return layout == ButtonLayout::NintendoBotw || layout == ButtonLayout::XboxBotw ||
-        layout == ButtonLayout::UniversalBotw || layout == ButtonLayout::BayxFlippedBotw;
+        layout == ButtonLayout::UniversalBotw || layout == ButtonLayout::BayxFlippedBotw ||
+        layout == ButtonLayout::PlayStationBotw || layout == ButtonLayout::PlayStationFlippedBotw ||
+        layout == ButtonLayout::SteamDeckBotw;
 }
 
 constexpr bool is_universal_layout(ButtonLayout layout) {
     return layout == ButtonLayout::Universal || layout == ButtonLayout::UniversalBotw;
+}
+
+constexpr bool is_steam_deck_layout(ButtonLayout layout) {
+    return layout == ButtonLayout::SteamDeck || layout == ButtonLayout::SteamDeckBotw;
+}
+
+constexpr bool has_flipped_botw_items(ButtonLayout layout) {
+    return layout == ButtonLayout::BayxFlippedBotw || layout == ButtonLayout::SteamDeckBotw ||
+        layout == ButtonLayout::PlayStationFlippedBotw;
 }
 
 enum class TextFont : int {

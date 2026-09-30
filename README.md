@@ -146,6 +146,13 @@ Dusklight's **Minimal HUD** setting to hide the HUD.
 
 ## Controller layouts
 
+**Steam Deck** uses BAYX Flipped face prompts with L1/R1 and L2/R2.
+Its BOTW variant uses the BAYX Flipped (BOTW Style) positions.
+**DualSense / PlayStation** uses PlayStation symbols. DualSense BOTW Style
+places Action on Cross/South, Attack on Square/West, and items on Triangle/North
+and Circle/East. Flipped BOTW exchanges the two item positions.
+These choices change prompts only; configure matching bindings in Dusklight.
+
 All **BAYX** layouts use Xbox shoulder/trigger prompts: LB, RB, LT, and RT,
 in either Silver or Black Pro style.
 
