@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.5.1 - Unreleased
+
+- Match Epona’s spur-bar button to the selected controller layout and button style.
+
 ## v2.5.0 - 2026-09-30
 
 - Added Alegreya Sans Medium as a font option.

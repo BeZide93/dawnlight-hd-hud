@@ -50,6 +50,7 @@ class TouchControls;
 #include "d/d_lib.h"
 #include "d/d_meter_HIO.h"
 #include "d/d_meter_haihai.h"
+#include "d/d_meter_hakusha.h"
 #include "d/d_meter2.h"
 #include "d/d_meter2_info.h"
 #include "d/d_pane_class.h"
@@ -183,6 +184,7 @@ DEFINE_HOOK(&dMeterButton_c::_create, MeterButtonCreateHook);
 DEFINE_HOOK(&dMeterButton_c::_delete, MeterButtonDeleteHook);
 DEFINE_HOOK(&dMeterButton_c::draw, MeterButtonDrawHook);
 DEFINE_HOOK(&dMeter2Draw_c::draw, MeterDrawHook);
+DEFINE_HOOK(&dMeterHakusha_c::draw, HorseSpurDrawHook);
 DEFINE_HOOK(&dMeter2Draw_c::drawButtonCross, MeterDrawButtonCrossHook);
 DEFINE_HOOK(&dMeter2Draw_c::drawButtonZ, MeterDrawButtonZHook);
 DEFINE_HOOK(&dMeter2Draw_c::drawKanteraMeter, MeterDrawKanteraMeterHook);
@@ -10210,6 +10212,23 @@ void hide_other_howl_pictures(J2DPane* pane, J2DPicture* button) {
     }
 }
 
+HookAction before_horse_spur_draw(ModContext*, void* args, void*, void*) {
+    auto* spurs = mods::arg<dMeterHakusha_c*>(args, 0);
+    if (spurs == nullptr || spurs->mpButtonA == nullptr) return HOOK_CONTINUE;
+    J2DPane* group = spurs->mpButtonA->getPanePtr();
+    J2DPicture* button = first_picture_pane(group);
+    ResTIMG const* texture = menu_face_button_texture(true);
+    if (button != nullptr && texture != nullptr) {
+        // The spur bar has its own button screen, separate from the main HUD.
+        button->changeTexture(texture, 0);
+        button->setTexCoord(button->getTexture(0), BIND15, MIRROR0, false);
+        set_neutral_picture_colors(button);
+        hide_other_pictures(group, button);
+        button->show();
+    }
+    return HOOK_CONTINUE;
+}
+
 #include "dialogue_text_screen.inc"
 
 HookAction before_message_object_draw(ModContext*, void* args, void*, void*) {
@@ -11502,6 +11521,7 @@ ModResult install_item_slot_hooks(ModError* error) {
         "hide legacy item-ring Z overlay");
     ADD_POST(MeterButtonDrawHook, after_meter_button_draw, "restore native action text size");
     ADD_PRE(MeterDrawHook, before_meter_draw, "HUD draw (before)");
+    ADD_PRE(HorseSpurDrawHook, before_horse_spur_draw, "Epona spur button prompt");
     ADD_PRE(ScreenDrawHook, before_meter_screen_draw,
         "HUD layout after native presentation");
     ADD_POST(MeterDrawHook, after_meter_draw, "HUD draw (after)");
