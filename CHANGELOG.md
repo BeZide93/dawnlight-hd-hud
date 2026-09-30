@@ -1,8 +1,8 @@
 # Changelog
 
-## v2.5.1 - Unreleased
+## v2.5.1 - 2026-09-30
 
-- Match Epona’s spur-bar button to the selected controller layout and button style.
+- Epona sup-bar icon fix
 
 ## v2.5.0 - 2026-09-30
 
